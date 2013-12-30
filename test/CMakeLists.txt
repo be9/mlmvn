@@ -1,4 +1,4 @@
-include_directories(${CMAKE_SOURCE_DIR}/lib)
+include_directories(../lib)
 
 add_executable(post_function post_function.cc)
 target_link_libraries(post_function mvn)
