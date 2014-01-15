@@ -9,12 +9,12 @@ namespace klogic {
     namespace learning {
         template<typename Desired>
         struct sample {
-            typedef Desired desired_type; 
+            typedef Desired desired_type;
 
             cvector input;
             Desired desired;
 
-            sample(const cvector &i, const Desired &d) : input(i), desired(d) {}        
+            sample(const cvector &i, const Desired &d) : input(i), desired(d) {}
         };
 
         // ------------------
@@ -59,7 +59,7 @@ namespace klogic {
                  typename LearnError = learn_error <typename Sample::desired_type> >
         class teacher {
         public:
-            teacher(Learner &_learner, 
+            teacher(Learner &_learner,
                     const std::vector<Sample> &samples = std::vector<Sample>())
                 : learner(_learner), _samples(samples)
                 {}
@@ -67,6 +67,10 @@ namespace klogic {
             // Add sample to the set
             void add_sample(const Sample &sample) {
                 _samples.push_back(sample);
+            }
+
+            void set_samples(const std::vector<Sample> &samples) {
+                _samples = samples;
             }
 
             // Learning set

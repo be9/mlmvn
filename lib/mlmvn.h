@@ -83,6 +83,8 @@ namespace klogic {
         // Returns total layer count in network (hidden + one output)
         size_t layers_count() const { return neurons.size(); }
 
+        size_t output_layer_size() const { return output_size; }
+
         // Correct weights
         void learn(const cvector &X, const cvector &error,
             double learning_rate = 1.0);
@@ -92,7 +94,7 @@ namespace klogic {
             return neurons[j][i];
         }
 
-        // Net output. Use with care since it allocates memory on each run 
+        // Net output. Use with care since it allocates memory on each run
         cvector output(const cvector &X) const;
 
         void dump() const;
