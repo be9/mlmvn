@@ -52,7 +52,7 @@ void klogic::mlmvn::learn(const klogic::cvector &X, const klogic::cvector &errs,
 
     do {
         int layer = calculator.current_layer();
-    
+
         // Divide by |z| for all layers except output
         bool variable_rate = layer < layers_count() - 1;
 
@@ -64,9 +64,13 @@ void klogic::mlmvn::learn(const klogic::cvector &X, const klogic::cvector &errs,
                                 input_end   = calculator.input_end();
 
         // Learn current layer of neurons
-        for (int k = 0; k < layer_neurons.size(); ++k) {
-            layer_neurons[k].learn(input_begin, input_end, layer_errors[k],
-                                   learning_rate, variable_rate);
+//#pragma omp parallel
+        {
+//#pragma omp for
+            for (int k = 0; k < layer_neurons.size(); ++k) {
+                layer_neurons[k].learn(input_begin, input_end, layer_errors[k],
+                                       learning_rate, variable_rate);
+            }
         }
     } while (!calculator.step());
 
@@ -99,13 +103,17 @@ void klogic::mlmvn::calculate_errors(const klogic::cvector &errs)
         double layer_s_j = s_j(j);
 
         // NOTE can be parallelized
-        for (int k = 0; k < layer_errors.size(); ++k) {
-            cmplx sum(0);
+#pragma omp parallel
+        {
+#pragma omp for
+            for (int k = 0; k < layer_errors.size(); ++k) {
+                cmplx sum(0);
 
-            for (int i = 0; i < next_layer_size; ++i)
-                sum += next_layer_errors[i] / next_layer_neurons[i].weight_for_input(k);
+                for (int i = 0; i < next_layer_size; ++i)
+                    sum += next_layer_errors[i] / next_layer_neurons[i].weight_for_input(k);
 
-            layer_errors[k] = sum / layer_s_j;
+                layer_errors[k] = sum / layer_s_j;
+            }
         }
     }
 }
