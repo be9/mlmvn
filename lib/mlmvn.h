@@ -80,9 +80,13 @@ namespace klogic {
         mlmvn(const std::vector<int> &sizes,
               const std::vector<int> &k_values);
 
-        // Returns total layer count in network (hidden + one output)
+        // Total layer count in network (hidden + one output)
         size_t layers_count() const { return neurons.size(); }
 
+        // Specific layer size
+        size_t layer_size(size_t layer) const { return neurons[layer].size(); }
+
+        // Output (last) layer size
         size_t output_layer_size() const { return output_size; }
 
         // Correct weights
@@ -91,6 +95,10 @@ namespace klogic {
 
         // i-th neuron in j-th layer
         mvn &neuron(int i, int j) {
+            return neurons[j][i];
+        }
+
+        const mvn &neuron(int i, int j) const {
             return neurons[j][i];
         }
 
