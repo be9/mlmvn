@@ -83,6 +83,9 @@ namespace klogic {
         // Total layer count in network (hidden + one output)
         size_t layers_count() const { return neurons.size(); }
 
+        // Input layer size
+        size_t input_layer_size() const { return input_size; }
+
         // Specific layer size
         size_t layer_size(size_t layer) const { return neurons[layer].size(); }
 
