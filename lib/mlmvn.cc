@@ -40,8 +40,6 @@ klogic::mlmvn::mlmvn(const vector<int> &sizes, const vector<int> &k_values)
 void klogic::mlmvn::learn(const klogic::cvector &X, const klogic::cvector &errs,
                           double learning_rate)
 {
-    // std::cerr << "Errs: " << errs << std::endl;
-
     // Calculate errors for all neurons (backward pass)
     calculate_errors(errs);
 
@@ -140,6 +138,44 @@ void klogic::mlmvn::dump_errors() const
     }
 }
 
+void klogic::mlmvn::export_neurons(klogic::cvector &all_weights, std::vector<int> &k_values) const
+{
+    all_weights.clear();
+    k_values.clear();
+
+    // calculate number of weights and reserve this size
+    size_t n_weights = 0, n_neurons = 0;
+
+    size_t prev_layer_size = input_size;
+
+    for (int layer = 0; layer < layers_count(); ++layer) {
+        size_t layer_size = neurons[layer].size();
+
+        n_weights += layer_size * (prev_layer_size + 1);
+        n_neurons += layer_size;
+
+        prev_layer_size = layer_size;
+    }
+
+    all_weights.reserve(n_weights);
+    k_values.reserve(n_neurons);
+
+    for (int layer = 0; layer < layers_count(); ++layer) {
+        const vector<mvn> &layer_neurons = neurons[layer];
+
+        for (int k = 0; k < layer_neurons.size(); ++k) {
+            // Neuron [(k+1), (layer+1)]
+            const cvector &weights(layer_neurons[k].weights_vector());
+
+            all_weights.insert(all_weights.end(), weights.begin(), weights.end());
+            k_values.push_back(layer_neurons[k].k_value());
+        }
+    }
+
+    // Sanity check
+    assert(all_weights.size() == n_weights);
+    assert(k_values.size() == n_neurons);
+}
 
 /*
  * mlmvn_forward_base

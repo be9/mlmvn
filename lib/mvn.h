@@ -26,6 +26,9 @@ namespace klogic {
         // Returns true if this neuron is discrete
         bool is_discrete() const { return k > 0; }
 
+        // Returns k
+        int k_value() const { return k; }
+
         // Uses Error-Correction Learning Rule (3.92) to
         // change weights. If variable_rate is true,
         // additional division by |z| is done per (3.94)
