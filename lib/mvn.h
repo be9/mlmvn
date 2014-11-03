@@ -36,7 +36,7 @@ namespace klogic {
                    const cmplx &error, double learning_rate = 1.0,
                    bool variable_rate = false);
 
-        void learn(const cvector &X, const cmplx &error, 
+        void learn(const cvector &X, const cmplx &error,
                    double learning_rate = 1.0, bool variable_rate = false) {
             learn(X.begin(), X.end(), error, learning_rate, variable_rate);
         }

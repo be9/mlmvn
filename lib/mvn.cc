@@ -28,12 +28,12 @@ klogic::cmplx klogic::mvn::weighted_sum(
 
     while (w != weights.end())
         z += (*w++) * (*x++);   // pairwise multiply and summate
-    
+
     return z;
 }
 
 //-------------------------------------------------------------------------
-void klogic::mvn::learn(cvector::const_iterator Xbeg, 
+void klogic::mvn::learn(cvector::const_iterator Xbeg,
                         cvector::const_iterator Xend,
                         const cmplx &error, double learning_rate, bool variable_rate)
 {
