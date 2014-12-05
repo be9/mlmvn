@@ -1,5 +1,6 @@
 #include <iostream>
 #include <algorithm>
+#include <stdexcept>
 #include "mlmvn.h"
 
 using std::vector;
@@ -138,13 +139,9 @@ void klogic::mlmvn::dump_errors() const
     }
 }
 
-void klogic::mlmvn::export_neurons(klogic::cvector &all_weights, std::vector<int> &k_values) const
+void klogic::mlmvn::get_stats(size_t &n_weights, size_t &n_neurons) const
 {
-    all_weights.clear();
-    k_values.clear();
-
-    // calculate number of weights and reserve this size
-    size_t n_weights = 0, n_neurons = 0;
+    n_weights = 0, n_neurons = 0;
 
     size_t prev_layer_size = input_size;
 
@@ -156,6 +153,17 @@ void klogic::mlmvn::export_neurons(klogic::cvector &all_weights, std::vector<int
 
         prev_layer_size = layer_size;
     }
+}
+
+void klogic::mlmvn::export_neurons(klogic::cvector &all_weights, std::vector<int> &k_values) const
+{
+    all_weights.clear();
+    k_values.clear();
+
+    // calculate number of weights and reserve this size
+    size_t n_weights, n_neurons;
+
+    get_stats(n_weights, n_neurons);
 
     all_weights.reserve(n_weights);
     k_values.reserve(n_neurons);
@@ -175,6 +183,39 @@ void klogic::mlmvn::export_neurons(klogic::cvector &all_weights, std::vector<int
     // Sanity check
     assert(all_weights.size() == n_weights);
     assert(k_values.size() == n_neurons);
+}
+
+void klogic::mlmvn::load_neurons(const klogic::cvector &all_weights, const std::vector<int> &k_values)
+{
+    size_t n_weights, n_neurons;
+
+    get_stats(n_weights, n_neurons);
+
+    if (all_weights.size() != n_weights || k_values.size() != n_neurons)
+        throw std::runtime_error("klogic::mlmvn::load_neurons(): size mismatch");
+
+    klogic::cvector::const_iterator  it_w = all_weights.begin();
+    std::vector<int>::const_iterator it_k = k_values.begin();
+
+    for (int layer = 0; layer < layers_count(); ++layer) {
+        vector<mvn> &layer_neurons = neurons[layer];
+
+        for (int k = 0; k < layer_neurons.size(); ++k) {
+            // Neuron [(k+1), (layer+1)]
+            size_t w = layer_neurons[k].weights_vector().size();
+            mvn neuron(*it_k, w - 1);
+
+            copy(it_w, it_w + w, neuron.weights_vector().begin());
+
+            layer_neurons[k] = neuron;
+
+            it_w += w;
+            ++it_k;
+        }
+    }
+
+    assert(it_w == all_weights.end());
+    assert(it_k == k_values.end());
 }
 
 /*

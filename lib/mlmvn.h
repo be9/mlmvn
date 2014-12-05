@@ -112,11 +112,15 @@ namespace klogic {
         void dump_errors() const;
 
         void export_neurons(cvector &all_weights, std::vector<int> &k_values) const;
+        void load_neurons(const cvector &all_weights, const std::vector<int> &k_values);
 
     protected:
         // Calculate errors for all neurons given
         // output layer errors
         void calculate_errors(const cvector &errs);
+
+        // Get overall weights and neurons counts
+        void get_stats(size_t &n_weights, size_t &n_neurons) const;
 
         std::vector<std::vector<mvn> >   neurons;
         std::vector<std::vector<cmplx> > errors;
